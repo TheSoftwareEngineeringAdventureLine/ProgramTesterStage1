@@ -3,10 +3,14 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <string>
+#include <fstream>
+
+
 #include "mytest.h"
-/*
-Compiles the specified program to a.out
-*/
+
+using namespace std;
+
+
 void compil(  char * root, char * progName )
 {
 
@@ -38,4 +42,39 @@ void compil(  char * root, char * progName )
 
   delete arg1;
   return;
+}
+/*
+ fout - the output stream to write to.
+ numPassed - the number of passed test cases.
+ numTest - the total number of test cases
+ */
+
+void FinalLogWrite( ofstream & fout, int numPassed, int numTest )
+{
+  int numFailed;
+  numFailed = numTest - numPassed;
+  float perPassed;
+  perPassed = (float) numPassed/numTest;
+  perPassed = perPassed * 100;
+  float perFailed;
+  perFailed = (float) numFailed/numTest;
+  perFailed = perFailed * 100;
+ 
+  
+  fout << "Percent of tests Passed: " << setprecision(2)
+       << perPassed <<  "%" << endl;
+  fout << "Percent of tests failed: " << setprecision(2)
+       << perFailed << "%" << endl;
+  return;
+}
+/*
+  fout - the output stream to write to.
+  testNumber - the number of the test case, i.e. test #1, test #2, etc.
+  status - The result of the test, passed or fail
+ */
+void LogWrite( ofstream & fout, int testNumber, std::string result )
+{
+  fout << "Test #" << testNumber << ", " << result.c_str() << std::endl;
+  return;
+  
 }
