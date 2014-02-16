@@ -8,7 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <iomanip>
+#include <time.h>
 
 /******************************************************************************//**
  * @author Andrew Koc
@@ -136,9 +137,9 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
   perFailed = perFailed * 100;
  
   //Write to stream.
-  fout << "Percent of tests Passed: " << setprecision(2)
+  fout << "Percent of tests Passed: " << std::setprecision(2)
        << perPassed <<  "%" << std::endl;
-  fout << "Percent of tests failed: " << setprecision(2)
+  fout << "Percent of tests failed: " << std::setprecision(2)
        << perFailed << "%" << std::endl;
   return;
 }
@@ -156,9 +157,9 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
  *
  *@returns none
  ****/
-void LogWrite( std::ofstream & fout, int testNumber, std::string result )
+void LogWrite( std::ofstream & fout, std::string testNumber, std::string result )
 {
-  fout << "Test #" << testNumber << ", " << result.c_str() << std::endl;
+  fout << testNumber << ": " << result.c_str() << std::endl;
   return;
   
 }
@@ -176,7 +177,7 @@ void LogWrite( std::ofstream & fout, int testNumber, std::string result )
  * to the tester functions
  * @returns none
  ***/
-void DirCrawl( std::string rootDir , std::fstream &logFile , std::string root , int &passed , int &tested )
+void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string root , int &passed , int &tested )
 {
 	DIR* dir = opendir( rootDir.c_str() );	// Open the directory
 	struct dirent* file;	// File entry structure from dirent.h
@@ -230,12 +231,48 @@ int main( int argc , char** argv )
 {
 	std::string rootPath;
 	char cCurrentPath[FILENAME_MAX];
+	time_t timer;
 
 	getcwd(cCurrentPath , sizeof(cCurrentPath) );
 
-	std::cout << cCurrentPath;
+	std::cout << cCurrentPath << std::endl;
+	time( &timer);
+	//getting the time
+	//Just need to print it out to the log file first thing.
+	std::cout << ctime( &timer ) << std::endl;
 	
+	//Find the ".cpp" 
+	//currently doing it in the current directory...
+	// need to change to use argv[1]
+	DIR* dir = opendir( cCurrentPath );
+	struct dirent* file;
+	std::string filename;
+	bool foundFlag = false;
+	std::string cppFile;
 
+	while( ( file = readdir(dir) ) != NULL && !foundFlag )
+	  {
+	    //Get the file name
+	    filename = file -> d_name;
+	    //skip over "." and ".."
+	    if( filename != "." && filename != ".." )
+	      {
+		if(filename.find( ".cpp" ) != std::string::npos )
+		  {
+		    cppFile = filename;
+		    foundFlag = true;
+		  }  
+	      }
+	  }
+
+	if( foundFlag )
+	  {
+	    std::cout << "Found this cpp file: " << cppFile << std::endl;
+	  }
+	else
+	  {
+	    std::cout << "Could not find a cpp file." << std::endl;
+	  }
 
 	return 0;
 }
