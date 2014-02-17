@@ -75,13 +75,10 @@ int main( int argc , char** argv )
       }
 
 
-    if( foundFlag )
-      {
-        std::cout << "Found this cpp file: " << cppFile << std::endl;
-      }
-    else
+    if( !foundFlag )
       {
         std::cout << "Could not find a cpp file." << std::endl;
+	std::cout << "Ending Program" << std::endl;
       }
     
     //Get the name for the log file
