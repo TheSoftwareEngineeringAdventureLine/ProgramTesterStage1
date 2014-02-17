@@ -4,13 +4,13 @@ CC = g++
 # compiler options
 CFLAGS = -c -Wall
 
-all: ProgramTester
+all: tester
 
-ProgramTester: ProgramTester.o
-	$(CC) -lm ProgramTester.o -o ProgramTester
+tester: tester.o
+	$(CC) -lm tester.o -o ProgramTester
 
-ProgramTester.o: ProgramTester.cpp
+tester.o: ProgramTester.cpp
 	$(CC) $(CFLAGS) ProgramTester.cpp
 
 clean:
-	rm -rf *o ProgramTester
+	rm -rf *o tester
