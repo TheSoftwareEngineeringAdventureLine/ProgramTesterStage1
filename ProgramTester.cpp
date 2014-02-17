@@ -264,17 +264,15 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
   //Calculate the percent passed.
   float perPassed;
   perPassed = (float) numPassed/numTest;
-  perPassed = perPassed * 100;
+  perPassed =  (int)(perPassed * 100);
   //Calculate the percent failed.
   float perFailed;
   perFailed = (float) numFailed/numTest;
-  perFailed = perFailed * 100;
+  perFailed = (int)(perFailed * 100);
  
   //Write to stream.
-  fout << "Percent of tests Passed: " << std::setprecision(2)
-       << perPassed <<  "%" << std::endl;
-  fout << "Percent of tests failed: " << std::setprecision(2)
-       << perFailed << "%" << std::endl;
+  fout << "Percent of tests Passed: " << perPassed <<  "%" << std::endl;
+  fout << "Percent of tests failed: " << perFailed << "%" << std::endl;
   return;
 }
 
