@@ -17,7 +17,7 @@
  *********************************************************************************/
 bool run_test_case( std::string test_file, std::string exec,
                     std::ofstream &log_file );
-void Compil(  char * root, char * progName );
+void Compil(  std::string root, std::string progName );
 void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest );
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
 void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
@@ -112,7 +112,7 @@ int main( int argc , char** argv )
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
-    Compil(root.c_str(), cppFile.c_str());
+    Compil(root, cppFile);
 
     
     //get directory to executable in string
@@ -228,10 +228,10 @@ bool run_test_case( std::string test_file, std::string exec,
  *
  * @returns none
  *********************************************************************************/
-void Compil(  char * root, char * progName )
+void Compil(  std::string root, std::string progName )
 {
   //Create the argument to send to g++
-  std::string progPath;
+  std::string progPath = "";
   progPath += root;
   progPath += "/";
   progPath += progName;
