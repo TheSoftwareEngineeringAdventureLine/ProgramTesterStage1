@@ -11,6 +11,130 @@
 #include <iomanip>
 #include <time.h>
 
+
+/**********************************************************************************
+ *                               FUNCTION PROTOTYPES
+ *********************************************************************************/
+bool run_test_case( std::string test_file, std::string exec,
+                    std::ofstream &log_file );
+void Compil(  char * root, char * progName );
+void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest );
+void LogWrite( std::ofstream & fout, std::string testNumber, std::string result );
+void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec ,
+               int &passed , int &tested );
+
+/******************************************************************************//**
+ *
+ *
+ *********************************************************************************/
+int main( int argc , char** argv )
+{
+    int passed = 0;
+    int tested = 0;
+    std::ofstream logfile;
+    std::string logName;
+    std::string root;
+    std::string exec;
+    char cCurrentPath[FILENAME_MAX];
+    time_t timer;
+
+    //check that an argument was passed
+    if ( argc < 2 )
+    {
+        std::cout << "No file was passed to test.\nExiting Program"
+                     << std::endl;
+        return 0;
+    }
+
+    //get current working directory, place in cCurrentPath
+    getcwd(cCurrentPath , sizeof(cCurrentPath) );
+
+    //Get the name for the log file
+    logName = argv[1];
+    //Remove the extension from the file name, keep the '.'
+    while(logName[logName.length() - 1] != '.')
+        logName.resize(logName.length() - 1);
+    //add the log to the file name
+    logName += "log";
+
+    //open log file and append to it
+    logfile.open(logName.c_str(), std::ofstream::app);
+
+    //Check that logfile was opened
+    if ( !logfile )
+    {
+        std::cout << "Log file could not be opened\nExiting Program"
+                     << std::endl;
+        return 0;
+    }
+
+    //getting the current time
+    time( &timer);
+    //Just need to print it out to the log file first thing.
+    logfile << "--------------------" << std::endl;
+    logfile << ctime( &timer ) << std::endl;
+
+    //Find the ".cpp"
+    //currently doing it in the current directory...
+    // need to change to use argv[1]
+
+    /*
+    DIR* dir = opendir( cCurrentPath );
+    struct dirent* file;
+    std::string filename;
+    bool foundFlag = false;
+    std::string cppFile;
+
+    while( ( file = readdir(dir) ) != NULL && !foundFlag )
+      {
+        //Get the file name
+        filename = file -> d_name;
+        //skip over "." and ".."
+        if( filename != "." && filename != ".." )
+          {
+        if(filename.find( ".cpp" ) != std::string::npos )
+          {
+            cppFile = filename;
+            foundFlag = true;
+          }
+          }
+      }
+
+
+    if( foundFlag )
+      {
+        std::cout << "Found this cpp file: " << cppFile << std::endl;
+      }
+    else
+      {
+        std::cout << "Could not find a cpp file." << std::endl;
+      }
+    */
+
+    //compile the code
+    //Passing the root directory of this program
+    //and the .cpp or .C file to be tested
+    Compil(cCurrentPath, argv[1]);
+
+    //get root directory in string
+    root = cCurrentPath;
+    //get directory to executable in string
+    exec = cCurrentPath;
+    exec += "/a.out";
+
+    //find and run test cases
+    DirCrawl( root + '/' , logfile , exec , passed , tested );
+
+    //write final output to logfile
+    FinalLogWrite(logfile,passed,tested);
+
+    //close logfile
+    logfile << "--------------------" << std::endl;
+    logfile.close();
+
+    return 0;
+}
+
 /******************************************************************************//**
  * @author Andrew Koc
  * 
@@ -31,30 +155,41 @@
  * @returns false - the program failed the test
  *
  *********************************************************************************/
-bool run_test_case( std::string test_file, std::string exec, std::ofstream &log_file )
+bool run_test_case( std::string test_file, std::string exec,
+                    std::ofstream &log_file )
 {
     std::string out_file = test_file;
     std::string ans_file = test_file;
+    std::string test_num = "";
     std::string command_string = "";
-    int len;
+    int i;
     int result;
 
-    //get text for .out file and .ans file
-    len = out_file.length();
-    out_file[len-3] = 'o';
-    out_file[len-2] = 'u';
-    out_file[len-1] = 't';
+    //get test number
+    //name for the test file will be "*case###.tst" so the last number is at
+    //position length - 5
+    for( i = test_file.length() - 5; test_file[i] >= '0' && test_file[i] <= '9'; i-- )
+        //since we are reading in backward the new number gets added at the front
+        test_num = test_file[i] + test_num;
 
-    ans_file[len-3] = 'a';
-    ans_file[len-2] = 'n';
-    ans_file[len-1] = 's';
+    //get text for .out file and .ans file
+    //remove tst
+    out_file.resize(out_file.size() - 3);
+    //add out so we have case#.out
+    out_file += "out";
+
+    //remove tst
+    ans_file.resize(out_file.size() - 3);
+    //add ans so we have case#.ans
+    ans_file += "ans";
 
     //command string = "executable < case.tst > case.out"
+    //run the program with input from .tst and pipe output to .out
     command_string = exec + " < " + test_file + " > " + out_file;
     //execute the program
     std::system(command_string.c_str());
 
-    //compare the programs output and the expected output
+    //compare the programs output and the expected output( .out and .ans )
     // diff --ignore-all-space case.out case.ans > nul
     //if it == 0 the files were the same
     // the --ignore ignores whitespace on each line, so trailing spaces
@@ -66,18 +201,18 @@ bool run_test_case( std::string test_file, std::string exec, std::ofstream &log_
     //passed test
     if ( result == 0 )
     {
-        //write_log( test_file, log_file, "passed" );
+        LogWrite(log_file, test_num,"passed");
         return true;
     }
     //failed test
     else
     {
-        //write_log( test_file, log_file, "failed" );
+        LogWrite(log_file, test_num,"failed");
         return false;
     }
 }
 
-/****
+/******************************************************************************//**
  * @author Jonathan Tomes
  * 
  * @Description
@@ -91,8 +226,7 @@ bool run_test_case( std::string test_file, std::string exec, std::ofstream &log_
  *                      (should include .cpp at the end.)
  *
  * @returns none
- ****/
-
+ *********************************************************************************/
 void Compil(  char * root, char * progName )
 {
   //Create the argument to send to g++
@@ -108,7 +242,7 @@ void Compil(  char * root, char * progName )
   return;
 }
 
-/****
+/******************************************************************************//**
  *@Author Jonathan Tomes
  *
  *@Description
@@ -120,8 +254,7 @@ void Compil(  char * root, char * progName )
  *@param[in] numTest - the total number of test cases.
  *
  *@returns none
- ****/
-
+ *********************************************************************************/
 void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
 {
   //Calculate the number of tests failed.
@@ -144,7 +277,7 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
   return;
 }
 
-/****
+/******************************************************************************//**
  *@author Jonathan Tomes
  *
  *@description
@@ -156,7 +289,7 @@ void FinalLogWrite( std::ofstream & fout, int numPassed, int numTest )
  *@param[in] status - The result of the test, passed or fail
  *
  *@returns none
- ****/
+ *********************************************************************************/
 void LogWrite( std::ofstream & fout, std::string testNumber, std::string result )
 {
   fout << testNumber << ": " << result.c_str() << std::endl;
@@ -164,7 +297,7 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
   
 }
 
-/***
+/******************************************************************************//**
  * @author Erik Hattervig
  *
  * @Description
@@ -176,8 +309,8 @@ void LogWrite( std::ofstream & fout, std::string testNumber, std::string result 
  * @param[in,out] logFile - a filestream to the logFile so that is passed on
  * to the tester functions
  * @returns none
- ***/
-void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string root , int &passed , int &tested )
+ *********************************************************************************/
+void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string exec , int &passed , int &tested )
 {
 	DIR* dir = opendir( rootDir.c_str() );	// Open the directory
 	struct dirent* file;	// File entry structure from dirent.h
@@ -198,7 +331,7 @@ void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string root ,
 			if ( (int)file->d_type == 4 )
 			{
 				//moves into the sub-directory
-				DirCrawl( rootDir + filename + "/" , logFile , root , passed , tested );
+                DirCrawl( rootDir + filename + "/" , logFile , exec , passed , tested );
 			}
 			else
 			{
@@ -207,7 +340,7 @@ void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string root ,
 				if ( filename.find( ".tst") != std::string::npos )
 				{
 					// pass the file onto the grader 
-					if (run_test_case( rootDir + '/' + filename , root , logFile ) )
+                    if (run_test_case( rootDir + '/' + filename , exec , logFile ) )
 					{
 						passed += 1;
 					}
@@ -223,59 +356,7 @@ void DirCrawl( std::string rootDir , std::ofstream &logFile , std::string root ,
 	return;
 }
 
-/******************************************************************************
- *
- *
- *****************************************************************************/
-int main( int argc , char** argv )
-{
-	std::string rootPath;
-	char cCurrentPath[FILENAME_MAX];
-	time_t timer;
 
-	getcwd(cCurrentPath , sizeof(cCurrentPath) );
-
-	std::cout << cCurrentPath << std::endl;
-	time( &timer);
-	//getting the time
-	//Just need to print it out to the log file first thing.
-	std::cout << ctime( &timer ) << std::endl;
-	
-	//Find the ".cpp" 
-	//currently doing it in the current directory...
-	// need to change to use argv[1]
-	DIR* dir = opendir( cCurrentPath );
-	struct dirent* file;
-	std::string filename;
-	bool foundFlag = false;
-	std::string cppFile;
-
-	while( ( file = readdir(dir) ) != NULL && !foundFlag )
-	  {
-	    //Get the file name
-	    filename = file -> d_name;
-	    //skip over "." and ".."
-	    if( filename != "." && filename != ".." )
-	      {
-		if(filename.find( ".cpp" ) != std::string::npos )
-		  {
-		    cppFile = filename;
-		    foundFlag = true;
-		  }  
-	      }
-	  }
-
-	if( foundFlag )
-	  {
-	    std::cout << "Found this cpp file: " << cppFile << std::endl;
-	  }
-	else
-	  {
-	    std::cout << "Could not find a cpp file." << std::endl;
-	  }
-
-	return 0;
-}
 
 
 
