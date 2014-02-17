@@ -37,54 +37,28 @@ int main( int argc , char** argv )
     std::string exec;
     char cCurrentPath[FILENAME_MAX];
     time_t timer;
+    DIR* dir;
+    struct dirent* file;
+    std::string filename;
+    bool foundFlag = false;
+    std::string cppFile;
 
     //check that an argument was passed
     if ( argc < 2 )
     {
-        std::cout << "No file was passed to test.\nExiting Program"
+        std::cout << "No argument was passed to test.\nExiting Program"
                      << std::endl;
         return 0;
     }
 
     //get current working directory, place in cCurrentPath
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
-
-    //Get the name for the log file
-    logName = argv[1];
-    //Remove the extension from the file name, keep the '.'
-    while(logName[logName.length() - 1] != '.')
-        logName.resize(logName.length() - 1);
-    //add the log to the file name
-    logName += "log";
-
-    //open log file and append to it
-    logfile.open(logName.c_str(), std::ofstream::app);
-
-    //Check that logfile was opened
-    if ( !logfile )
-    {
-        std::cout << "Log file could not be opened\nExiting Program"
-                     << std::endl;
-        return 0;
-    }
-
-    //getting the current time
-    time( &timer);
-    //Just need to print it out to the log file first thing.
-    logfile << "--------------------" << std::endl;
-    logfile << ctime( &timer ) << std::endl;
+    //get root directory in string
+    root = cCurrentPath;
+    root = root +"/"+argv[1];
 
     //Find the ".cpp"
-    //currently doing it in the current directory...
-    // need to change to use argv[1]
-
-    /*
-    DIR* dir = opendir( cCurrentPath );
-    struct dirent* file;
-    std::string filename;
-    bool foundFlag = false;
-    std::string cppFile;
-
+    dir = opendir( root.c_str() );
     while( ( file = readdir(dir) ) != NULL && !foundFlag )
       {
         //Get the file name
@@ -109,15 +83,38 @@ int main( int argc , char** argv )
       {
         std::cout << "Could not find a cpp file." << std::endl;
       }
-    */
+    
+    //Get the name for the log file
+    logName = cppFile;
+    //Remove the extension from the file name, keep the '.'
+    while(logName[logName.length() - 1] != '.')
+        logName.resize(logName.length() - 1);
+    //add the log to the file name
+    logName += "log";
+
+    //open log file and append to it
+    logfile.open(logName.c_str(), std::ofstream::app);
+
+    //Check that logfile was opened
+    if ( !logfile )
+    {
+        std::cout << "Log file could not be opened\nExiting Program"
+                     << std::endl;
+        return 0;
+    }
+
+    //getting the current time
+    time( &timer);
+    //Just need to print it out to the log file first thing.
+    logfile << "--------------------" << std::endl;
+    logfile << ctime( &timer ) << std::endl;
 
     //compile the code
     //Passing the root directory of this program
     //and the .cpp or .C file to be tested
-    Compil(cCurrentPath, argv[1]);
+    Compil(root.c_str(), cppFile.c_str());
 
-    //get root directory in string
-    root = cCurrentPath;
+    
     //get directory to executable in string
     exec = cCurrentPath;
     exec += "/a.out";
@@ -131,6 +128,10 @@ int main( int argc , char** argv )
     //close logfile
     logfile << "--------------------" << std::endl;
     logfile.close();
+
+    //remove junk files
+    system("rm a.out");
+    system("rm nul");
 
     return 0;
 }
