@@ -79,6 +79,7 @@ int main( int argc , char** argv )
       {
         std::cout << "Could not find a cpp file." << std::endl;
 	std::cout << "Ending Program" << std::endl;
+        return 0;
       }
     
     //Get the name for the log file
