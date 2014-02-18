@@ -54,8 +54,8 @@ int main( int argc , char** argv )
     //get current working directory, place in cCurrentPath
     getcwd(cCurrentPath , sizeof(cCurrentPath) );
     //get root directory in string
-    root = cCurrentPath;
-    root = root +"/"+argv[1];
+    
+    root = argv[1];
 
     //Find the ".cpp"
     dir = opendir( root.c_str() );
@@ -83,7 +83,7 @@ int main( int argc , char** argv )
       }
     
     //Get the name for the log file
-    logName = cppFile;
+    logName = root + '/' + cppFile;
     //Remove the extension from the file name, keep the '.'
     while(logName[logName.length() - 1] != '.')
         logName.resize(logName.length() - 1);
