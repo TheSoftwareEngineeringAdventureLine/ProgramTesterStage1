@@ -29,8 +29,14 @@ Finding the test cases, but in general this library allows us to search for file
 the code it uses a system command to invoke g++ and compile it.
 
 \subsection{Data Flow Diagram}
-It is important to build and maintain a data flow diagram.  However, it may be 
-that a component is best described visually with an architecture diagram. 
+Figure~\ref{DataFlow1} Shows the Data Flow up to this point.
+
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./DataFlow1}
+\end{center}
+\caption{Data Flow (Locate and Compile) \label{DataFlow1}}
+\end{figure}
 
 
 \subsection{Design Details}
@@ -102,8 +108,14 @@ to search for certain file extensions, and d\_type is a code for the type of fil
 subdirectories. 
 
 \subsection{Data Flow Diagram}
-It is important to build and maintain a data flow diagram.  However, it may be 
-that a component is best described visually with an architecture diagram. 
+Figure~\ref{DataFlow2} Shows the Data Flow up to this point.
+
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./DataFlow2}
+\end{center}
+\caption{Data Flow (Locate and Compile) \label{DataFlow2}}
+\end{figure}
 
 
 \subsection{Design Details}
@@ -171,8 +183,14 @@ have been the output of the file.  The console output is piped into a junk file 
 returns zero then the files contain the same thing.
 
 \subsection{Data Flow Diagram}
-It is important to build and maintain a data flow diagram.  However, it may be 
-that a component is best described visually with an architecture diagram. 
+Figure~\ref{DataFlow3} Shows the Data Flow up to this point.
+
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./DataFlow3}
+\end{center}
+\caption{Data Flow (Locate and Compile) \label{DataFlow3}}
+\end{figure}
 
 
 \subsection{Design Details}
@@ -248,7 +266,14 @@ writes the final results of the testing.  The ofstream is opened in main to appe
 .cpp file are saved.
 
 \subsection{Data Flow Diagram}
-I'm going to build some images for this later.
+Figure~\ref{DataFlow4} Shows the Data Flow up to this point.
+
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{./DataFlow4}
+\end{center}
+\caption{Data Flow (Locate and Compile) \label{DataFlow4}}
+\end{figure}
 
 \subsection{Design Details}
 This first function writes the results of a single test case, it is called by the testing function after it knows determines if the case
