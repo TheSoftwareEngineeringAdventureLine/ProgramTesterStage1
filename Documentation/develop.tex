@@ -1,23 +1,47 @@
 % !TEX root = SystemTemplate.tex
 \chapter{Development Environment}
-The basic purpose for this section is to give a developer all of the necessary 
-information to setup their development environment to run, test, and/or develop. 
+Since the program was to test files on a Linux enviornment, it was developed
+on a Linux enviornment.
 
 
 \section{Development IDE and Tools}
-Describe which IDE and provide links to installs and/or reference material. 
+No special Tools or IDE were used to develop this.  Since the code was so simple
+each programmer just used what ever coding enviornment they wanted.  All
+the code was tested on a Linux machine using the g++ compiler.  The debug tool
+gdb was used to debug the code when necessary.
 
 \section{Source  Control}
-Which source control system is/was used?  How was it setup?  How does a developer 
-connect to it? 
+We used github for source control.  The repository can be found at this url: 
+
+https://github.com/TheSoftwareEngineeringAdventureLine/ProgramTesterStage1.git
 
 \section{Dependencies}
-Describe all dependencies associated with developing the system. 
+This program is dependent on the C++ Standard Library as well as the g++ compiler
+on a Linux system.
 
 \section{Build  Environment}
-How are the packages built?  Are there build scripts? 
+The execuatble is built by the g++ compiler.  You can either compile it manually, using the command:
+\begin{lstlisting}
+g++ -o tester ProgramTester.cpp
+\end{lstlisting}
+Or by using the following make file:
 
-\section{Development Machine Setup}
-If warranted, provide a list of steps and details associated with setting up a 
-machine for use by a developer. 
+\begin{lstlisting}
+# compiler
+CC = g++
+
+# compiler options
+CFLAGS = -c -Wall
+
+all: tester
+
+tester: tester.o
+	$(CC) -lm tester.o -o ProgramTester
+
+tester.o: ProgramTester.cpp
+	$(CC) $(CFLAGS) ProgramTester.cpp
+
+clean:
+	rm -rf *o tester
+\end{lstlisting}
 

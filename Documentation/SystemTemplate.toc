@@ -67,7 +67,6 @@
 \contentsline {section}{\numberline {6.2}Source Control}{17}{section.6.2}
 \contentsline {section}{\numberline {6.3}Dependencies}{17}{section.6.3}
 \contentsline {section}{\numberline {6.4}Build Environment}{17}{section.6.4}
-\contentsline {section}{\numberline {6.5}Development Machine Setup}{17}{section.6.5}
 \contentsline {chapter}{\numberline {7}Release -- Setup -- Deployment}{19}{chapter.7}
 \contentsline {section}{\numberline {7.1}Deployment Information and Dependencies}{19}{section.7.1}
 \contentsline {section}{\numberline {7.2}Setup Information}{19}{section.7.2}
